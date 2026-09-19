@@ -1,0 +1,51 @@
+# Ingress Controller
+
+**References**
+- [ingress-nginx/How it works](https://kubernetes.github.io/ingress-nginx/how-it-works/#avoiding-reloads-on-endpoints-changes)
+- [Kubernetes Informers](https://www.plural.sh/blog/manage-kubernetes-events-informers/)
+
+L'ingress controller è il componente che permette e regola il traffico esterno in entrata (*north-south traffic*) verso i carichi applicativi ospitati all'interno di un cluster Kubernetes. In altre parole, l'ingress controller permette il corretto funzionamento delle Ingress resources. A differenza di altre tipologie di controller che sono già presenti all'interno di un cluster e sono avviati automaticamente, questo non avviene per l'ingress controller che necessita di un'installazione dedicata. 
+
+Ci sono numerosi progetti che forniscono un ingress controller, ma [ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/main) è l'ingress controller ufficialmente sviluppato dalla community Kubernetes, che sfrutta le funzionalità di NGINX.
+
+### ingress-nginx
+
+L'ingress-nginx è, come anticipato precedentemente, sviluppato dalla community Kubernetes ed è largamente adottato. **L'obiettivo di questo ingress controller è quello di costruire un file `nginx.conf`**. L'implicazione più importante di questo requisito è la necessità di un reload di NGINX a seguito di un cambio di configurazione. Un controller Kuberntes ricorre ad un *control loop* per verificare se lo stato del cluster è quello desiderato oppure se è necessaria una modifica. Per questo **viene costruito un modello** che è fatto di diversi oggetti quali Ingresses, Services, Endpoints, Secrets e Configmaps **per generare un configuration file in un determinato istante di tempo che rifletta lo stato del cluster**. 
+
+A tal fine, vengono utilizzati i Kubernetes Informers - un component che consente di osservare i cambiamenti delle risorse nel cluster - e consentono di reagire sfruttando delle callbacks quando un oggetto è aggiunto, modificato o rimosso. **Tuttavia, non vi è alcun modo per sapere in anticipo se un cambiamento di determinato oggetto influenzerà il configuration file. Di conseguenza, per ogni cambiamento, bisogna costruire un nuovo modello sulla base dello stato del cluster e compararlo con il modello corrente;** se sono uguali, non viene generata una nuova configurazione NGINX e non è necessario un reload. Altrimenti, viene verificato se la differenza sia solo in termini di Endpoints: in questo caso viene inviata una lista di nuovi Endpoints ad un handler Lua che gira all'interno di NGINX utilizzando una chiamata POST ed evitando di generare un nuovo file di configurazione. In caso contrario, ovvero se la differenza dei modelli coinvolge altri aspetti oltre agli Endpoints, viene creato un nuovo configuration file sulla base del modello creato, sostituito il modello corrente e viene azionato il reload di NGINX. La rappresentazione finale della configurazione NGINX è generata a partire da un template Go utilizzando il nuovo modello come input per le variabili richieste dal template.
+
+### ingress-nginx: installazioni Bare-metal
+
+**References**
+- [Bare-metal considerations](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/)
+
+Gli ambienti cloud consentono di disporre di risorse *on-demand* e per ingress-nginx è possibile utilizzare un semplice Kubernetes manifest per ottenere un load balancer automaticamente, stabilendo un *single point of contact* tra le applicazioni nel cluster ed il mondo esterno; infatti, tipicamente quando l'ingress-nginx viene installato, l'esposzione verso l'esterno avviene tramite un Service di tipo `LoadBalancer`. In ambienti bare-metal non è presente questa funzionalità - [Kubernetes non mette nativamente a disposizione un load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) - dunque è necessario modificare il setup inziale.
+
+### MetaLB: una soluzione di load balancing per installazioni bare-metal
+
+**Resources**
+- [MetalLB Concepts](https://metallb.io/concepts/)
+- [MetalLB in layer 2 mode](https://metallb.io/concepts/layer2/)
+- [MetalLB in BGP mode](https://metallb.io/concepts/bgp/)
+
+MetaLB implementa un network load balancer all'interno di un cluster Kubernetes. In poche parole, **consente di creare servizi di tipo `LoadBalancer` in cluster che non sono eseguiti all'interno di un cloud provider**. Questo servizio viene offerto grazie a due funzionalità quali: *address allocation* - assegnare un IP esterno ad un servizio - e *external announcement* - annunciare l'IP assegnato alla rete esterna, in modo che il traffico arrivi al cluster.
+
+L'assegnazione di un IP esterno in un cloud provider avviene automaticamente, mentre per ambienti bare metal MetalLB è responsabile di questa allocazione. L'indirizzo IP non viene preso casualmente, ma viene recuperato da un *address pool* definito in fase di installazione. In altre parole, MetalLB avrà cura di assegnare o ritirare indirizzi quando necessario ma lo farà unicamente attingendo dal pool configurato. 
+
+Dopo che un `externalIP` viene assegnato ad un service, la rete fuori dal cluster deve sapere che quell'indirizzo vive nel cluster. Questo è possibile grazie all'utilizzo da parte di MetalLB di protocolli di rete (ARP, NDP, o BGP) che variano a seconda delle due modalità previste: *Layer 2* e *BGP*.
+
+- Layer 2. In questa modalità, un nodo si assume la responsabilità di annunciare un Service alla rete locale. Dal punto di vista di rete, è come se una macchina avesse più indirizzi IP, cosa che si evince anche dalle tabelle ARP. MetalLB, infatti, risponde alle richieste ARP per i servizi IPv4 e alle richieste NDP per IPv6. Il vantaggio di questa modalità è la possibilità di essere utilizzato in maniera universale, senza la necessità di hardware particolare. In Layer 2, tutto il traffico va verso un solo nodo (*single-node bottlenecking*), successivamente è kube-proxy che distribuisce il traffico fino ai pod. Layer 2 **non implementa un load balancer, quanto piuttosto un meccanismo di failover che consente ad un nodo diverso di divenire "leader" se il nodo che riceve traffico fallisce per qualche motivo**.
+
+- BGP. In questa modalità ogni nodo del cluster stabilise una sessione di peering BGP con i router della rete ed utilizza questa sessione per annunciare gli indirizzi IP dei Services esposti all'esterno - di tipo `LoadBalancer` - del cluster. Questa modalità consente un vero bilanciamento del carico che viene fatto *per-connection*, ovvero tutti i pacchetti di una singola connessione vengono inviati ad un determinato nodo nel cluster. La divisione del traffico, e quindi il bilanciamento, avviene solo tra connessioni diverse e non dentro una singola connessione; ad esempio, date due connessioni A, B ed un cluster con tre nodi 1, 2 e 3, MetalLB bilancerà tutti i pacchetti della connessione A sul nodo 1 e tutti i pacchetti della connessione B su nodo 2. Questa implementazione evita il *packet reordering*, migliorando sensibilmente la performance sull'host finale. Inoltre, evita che nodi diversi inviino pacchetti a Pods diversi, in quanto la scelta dell'indirizzamento di un pacchetto non è consistente tra nodi distinti. Questo vuol dire che due nodi differenti possono decidere di instradare pacchetti appartenenti alla stessa connessione a Pods distinti.
+
+### MetalLB: approfondimento su Layer2
+
+Layer 2 ha due limitazioni principali: tutto il traffico passa per un solo nodo - il già citato *single-node bottlenecking* - e un failover lento.
+
+Nell'implementazione corrente, il failover tra due nodi dipende dalla cooperazione tra più client. Nel caso di un failover, MetaLB invia un numero di pacchetti (per IPv4, si tratta di [Gratuitous ARP: *[...]They assist in the updating of other machines' ARP table. Clustering solutions utilize this when they move an IP from one NIC to another, or from one machine to another.[...]*](https://wiki.wireshark.org/Gratuitous_ARP)) per annunciare che l'IP associato al Service di tipo LoadBalancer dell'ingress controller - in altre parole, l'externalIP - ha un diverso MAC address. Questo causa l'aggiornamento, per IPv4, delle tabelle di ARP degli altri host sulla rete; in queste tabelle si evince come uno stesso MAC address è associato a due IP diversi: uno preso dall'address pool dichiarato per MetalLB e l'altro è proprio quello associato al nodo che in quel momento è il nuovo leader. La maggior parte dei sistemi operativi gestisce questi pacchetti correttamente e l'aggiornamento avviene senza problemi. Tuttavia, alcuni sistemi possono non implementare in alcun modo il *gratuitos handling* oppure avere un'implementazione non performante che causa un update molto lento.
+
+#### Individuazione del leader
+
+Per verificare il funzionamento di MetalLB e di come seleziona il leader si è deciso di considerare un caso di studio "limite". Il cluster considerato è un'installazione K8s bare-metal, con Ingress Controller NGINX di f5 (Open Source), il quale ha un Service type `LoadBalancer` con `externalTrafficPolicy` uguale a `Local` (anzichè `Cluster`, valore di default), e MetalLB in modalità Layer 2. Il Pod dell'ingress controller è installato, come Deployment, su un nodo leader per MetalLB ed ha un'unica replica. 
+
+Il test ha previsto lo spostamento forzato del Pod del controller NGINX su un nuovo nodo - non leader al momento dello spostamento - imponendo un'affinity grazie al `nodeSelector` (l'affinity consente di simulare quanto accadrebbe nel caso di fail del nodo). **A valle del cambio nodo, il leader eletto da MetalLB cambia e diviene il nuovo nodo che ospita il pod**. Questo accade **perchè cambia lo stato degli endpoint del Service**, che ha un impatto diretto sulla lista dei candidati calcolata - in maniera *stateless* tramite hash - dai nodi. Nel caso dello spostamento il precedente nodo perde l'endpoint attivo, mentre il nuovo nodo ospite guadagna un endpoint attivo: **se il Service del controller NGINX ha `externalTrafficPolicy` uguale a `Local`, MetalLB considera solo i nodi con endpoint locali attivi come candidati per annunciare l'IP selezionato**. Dunque, cambiando il nodo dove gira il Pod, cambia anche la lista dei nodi candidati per annunciare l'IP esterno.
