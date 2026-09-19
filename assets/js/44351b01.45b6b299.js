@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjust_the_devops_docs=self.webpackChunkjust_the_devops_docs||[]).push([["2396"],{5977(e){e.exports=JSON.parse('{"metadata":{"permalink":"/just-the-devops-docs/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
