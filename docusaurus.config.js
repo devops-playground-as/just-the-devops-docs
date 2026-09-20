@@ -91,8 +91,7 @@ const config = {
         },
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
+            to: '/docs/',
             position: 'left',
             label: 'DevOps',
           },
