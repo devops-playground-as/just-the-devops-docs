@@ -4,27 +4,95 @@
  * work well for content-centric websites.
  */
 
-/* You can override the default Infima variables here. */
+/* A quiet, documentation-first palette built on slate and blue. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-primary: #355f9f;
+  --ifm-color-primary-dark: #2d528a;
+  --ifm-color-primary-darker: #2a4d81;
+  --ifm-color-primary-darkest: #223f6a;
+  --ifm-color-primary-light: #4772b2;
+  --ifm-color-primary-lighter: #6389c0;
+  --ifm-color-primary-lightest: #91add4;
+
+  --ifm-background-color: #f3f6fb;
+  --ifm-background-surface-color: #fbfcfe;
+  --ifm-font-color-base: #1d2b40;
+  --ifm-font-color-secondary: #4c6078;
+  --ifm-heading-color: #14213a;
+  --ifm-link-color: #2d528a;
+  --ifm-link-hover-color: #223f6a;
+  --ifm-toc-border-color: #d8e1ed;
+  --ifm-hr-border-color: #d8e1ed;
+  --ifm-menu-color: #4c6078;
+  --ifm-menu-color-active: #2d528a;
+  --ifm-menu-color-background-active: #e3edf9;
+  --ifm-code-font-size: 90%;
+  --ifm-code-background: #eef2f7;
+  --ifm-code-border-radius: 0.3rem;
+  --ifm-global-radius: 0.4rem;
+  --ifm-navbar-shadow: 0 1px 0 rgba(15, 23, 42, 0.08);
+  --ifm-navbar-background-color: rgba(251, 252, 254, 0.9);
+  --ifm-table-border-color: #e2e8f0;
+  --docusaurus-highlighted-code-line-bg: rgba(37, 99, 168, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #76aeea;
+  --ifm-color-primary-dark: #5599df;
+  --ifm-color-primary-darker: #458fd9;
+  --ifm-color-primary-darkest: #2074bd;
+  --ifm-color-primary-light: #97c3f0;
+  --ifm-color-primary-lighter: #acd0f4;
+  --ifm-color-primary-lightest: #d7e9fb;
+
+  --ifm-background-color: #111827;
+  --ifm-background-surface-color: #172033;
+  --ifm-font-color-base: #dbe5f1;
+  --ifm-font-color-secondary: #a5b4c7;
+  --ifm-heading-color: #f1f5f9;
+  --ifm-link-color: #97c3f0;
+  --ifm-link-hover-color: #d7e9fb;
+  --ifm-toc-border-color: #2c3a50;
+  --ifm-hr-border-color: #2c3a50;
+  --ifm-menu-color: #a5b4c7;
+  --ifm-menu-color-active: #acd0f4;
+  --ifm-menu-color-background-active: #203451;
+  --ifm-code-background: #202c3f;
+  --ifm-navbar-shadow: 0 1px 0 rgba(148, 163, 184, 0.12);
+  --ifm-navbar-background-color: rgba(23, 32, 51, 0.9);
+  --ifm-table-border-color: #2c3a50;
+  --docusaurus-highlighted-code-line-bg: rgba(118, 174, 234, 0.16);
+}
+
+body {
+  line-height: 1.65;
+}
+
+.navbar {
+  backdrop-filter: blur(10px);
+}
+
+.navbar__title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  letter-spacing: -0.025em;
+}
+
+.markdown h2 {
+  margin-top: 2.75rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--ifm-hr-border-color);
+}
+
+.markdown code {
+  border: 1px solid var(--ifm-hr-border-color);
+}
+
+.theme-code-block {
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
 }
