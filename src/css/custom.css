@@ -68,8 +68,11 @@ body {
   line-height: 1.65;
 }
 
-.navbar {
-  backdrop-filter: blur(10px);
+/* On mobile the navbar contains Docusaurus' fixed sidebar drawer. */
+@media screen and (min-width: 997px) {
+  .navbar {
+    backdrop-filter: blur(10px);
+  }
 }
 
 .navbar__title {
