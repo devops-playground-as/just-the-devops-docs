@@ -1,0 +1,82 @@
+import RecreateTraffic from '@site/static/img/k8s/recreate.png';
+import RecreateGif from '@site/static/img/k8s/recreate.gif';
+
+# Strategie di deploy
+
+Di seguito sono riepilogate le principali strategie di *deploy* che possono essere impiegate all'interno di Kubernetes per aggiornare i workload. In particolare, si fara' riferimento al workload da sostituire con la dicitura *versione A*, mentre il nuovo sara' indicato con *versione B*. Per ogni strategia:
+
+- verra' fornita una breve descrizione, con l'indicazione dei relativi pro e contro
+- sara' mostrata un'immagine animata che illustra il funzionamento della strategia
+- sara' rappresentato l'andamento dello *user-traffic* da versione A a versione B.   
+
+## Recreate
+
+La strategia di *Recreate* e' la piu' semplice e consiste nello spegnere la versione A, i cui workload vengono eliminati, ed effettuare il deploy della versione B dopo che tutti i workload della versione A sono stati spenti.
+
+**PROs**
+- Semplice da mettere in campo.
+- Nuovo stato dell'applicazione.
+
+**CONs**
+- L'utente sperimenta un disservizio, sia a causa dello spegnimento dell'applicazione che per il suo successivo *startup*.
+
+
+<img
+  src={RecreateGif}
+  alt="Andamento del traffico nella strategia Recreate"
+  width={600}
+/>
+<img
+  src={RecreateTraffic}
+  alt="Andamento del traffico nella strategia Recreate"
+  width={500}
+/>
+
+![Recreate](/img/k8s/recreate.gif)
+![Recreate Traffic](/img/k8s/recreate.png)
+
+## Ramped (Rolling Update)
+
+**PROs**
+
+**CONs**
+
+
+![Ramped](/img/k8s/ramped.gif)
+![Ramped Traffic](/img/k8s/ramped.png)
+
+## Blue-Green
+![Blue Green](/img/k8s/blue-green.gif)
+![Blue Green Traffic](/img/k8s/blue-green.png)
+
+## Canary
+
+**PROs**
+
+**CONs**
+
+![Canary](/img/k8s/canary.gif)
+![Canary Traffic](/img/k8s/canary.png)
+
+## A/B Test
+
+**PROs**
+
+**CONs**
+
+![A/B](/img/k8s/a-b.gif)
+![A/B Traffic](/img/k8s/a-b.png)
+
+## Shadow
+
+**PROs**
+
+**CONs**
+
+![Shadow](/img/k8s/shadow.gif)
+![Shadow Traffic](/img/k8s/shadow.png)
+
+
+**Risorse**
+
+- [Six Strategies for Application Deployment](https://thenewstack.io/deployment-strategies/)

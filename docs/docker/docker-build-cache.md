@@ -16,7 +16,7 @@ Tuttavia, quando un layer subisce una modifica, quel layer deve passare per una 
 Come detto in precedenza, durante una build con Docker, un layer è riutilizzato dalla cache se le istruizioni e i file da cui dipende non hanno subito una modifica dalla build precedente. Ci sono alcune best practices che consentono di ottimizzare l'utilizzo della cache e velocizzare il processo di build.
 
 ### Ordinare i layer
-I comandi in un Dockerfile devono essere disposti secondo un ordine logico, evitando di invalidare la cache. Come regola generale, **gli step più onerosi vanno inseriti all'inizio del Dockerfile**, mentre i **comandi che cambiano con più frequenza, devono appararire alla fine del Dockerfile**, per evitare di azionare di nuovo la build di layers che non sono cambiati.
+I comandi in un Dockerfile devono essere disposti secondo un ordine logico, evitando di invalidare la cache. Come regola generale, **gli step più onerosi vanno inseriti all'inizio del Dockerfile**, mentre i **comandi che cambiano con più frequenza, devono apparire alla fine del Dockerfile**, per evitare di azionare di nuovo la build di layers che non sono cambiati.
 
 Nella porzione di Dockerfile riportata di seguito si può notare come l'istruzione di installazione delle dipendenze segua il comando di `COPY`. In questo modo, **l'installazione delle dipendenze verrà avviata anche se queste non sono cambiate, ma sarà azionata da un update di un qualsiasi file nel progetto**.
 
@@ -52,7 +52,7 @@ FROM golang:latest
 WORKDIR /app
 RUN --mount=type=bind,target=. go build -o /app/hello
 ```
-In questo esempio, la directory corrente viene montata prima che il comando di `go build` venga eseguito. I file sono disponibili per tutta la durata dell'esecuzione del comando di `RUN`; quando l'istruzione termina, i file non verranno mantenuti nell'immagine finale o nella build cache. Nell'immagine rimmarrà solo l'output del comando del `go build`.
+In questo esempio, la directory corrente viene montata prima che il comando di `go build` venga eseguito. I file sono disponibili per tutta la durata dell'esecuzione del comando di `RUN`; quando l'istruzione termina, i file non verranno mantenuti nell'immagine finale o nella build cache. Nell'immagine rimarrà solo l'output del comando del `go build`.
 
 A differenza delle istruzioni di `COPY` e `ADD` che aggiungono file all'immagine costruita, l'utilizzo di bind mount ottimizza la build cache evitando di aggiungere layers non necessari; ad esempio, se alcuni file particolarmente grandi vengono usati solo per generare un artefatto, conviene ricorrere al bind mount anzichè includerli nell'immagine. In merito al bind mount, ci sono alcuni punti di attenzione.
 

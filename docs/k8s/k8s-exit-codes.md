@@ -1,6 +1,6 @@
 # Exit Codes
 
-A seguito del un fallimento di un pod, passato presumibilmente in uno stato `CrashLoopBackOff` e con il numero di restart che aumenta, è importante determinare cosa ha determinato questa situazione. Bisogna chiedersi con quale *exit code* è fallito il pod? **Gli *exit codes* sono numeri interi che sono restituiti a seguito della terminazione di un processo del un container e contengono informazioni su tale terminazione.** Gli *exit code* 
+A seguito di un fallimento di un pod, passato presumibilmente in uno stato `CrashLoopBackOff` e con il numero di restart che aumenta, è importante determinare cosa ha determinato questa situazione. Bisogna chiedersi con quale *exit code* è fallito il pod? **Gli *exit codes* sono numeri interi che sono restituiti a seguito della terminazione di un processo di un container e contengono informazioni su tale terminazione.** Gli *exit code* 
 
 - vanno da 0 a 255, dove `0` indica una terminazione senza errori
 - i segnali superiori a 128 indicano che il processo è stato terminato da un segnale del sistema operativo (*OS signal*)
@@ -51,7 +51,7 @@ Il processo viene terminato forzatamente senza poter eseguire cleanup a seguito 
 
 ![OOMKilled](/img/k8s/oomkilled.png)
 
-La *Reason* presente nell'immagine viene impostata da Kubernetes e non dall'applicazione. **L'evento di *OOMKill* apparte anche nei kernel log del nodo**.
+La *Reason* presente nell'immagine viene impostata da Kubernetes e non dall'applicazione. **L'evento di *OOMKill* appare anche nei kernel log del nodo**.
 
 > **Nota**: nel caso di cluster gestito, in cui i nodi non sono direttamente accessibili è possibile utilizzare il comando `kubectl debug node/<node-name>`.
 
@@ -123,7 +123,7 @@ In questo caso la diagnosi prevede l'ispezione dei log del container che e' term
 
 ### Il ruolo del *fine-tuning* per gli *exit code*
 
-Come visto dalla natura degli *exit code*, non tutti sono causati da un bug applicativo. Il 137, nel caso di *OOMKilled* ed in assenza di *memory leakage*, fornisce evidenza di un problema di natura strutturale: il limite di memoria fissato in fase di *deployment* non e' piu' sufficiente per il workload e va effettuato un nuovo dimensionamento. Come detto in precedenza, il VPA  puo' aiutare aggiornando i *requests* e *limits* delle risorse del pod, effettuandone pero' un restart nel caso di `updateMode` uguale a `Recreate` o `InPlaceOrRecreate`. Per queste due modalita' **e' buona norma tenere in considerazione la disponibilita' delle repliche del pod ed eventualmente abbinare il VPA ad un PodDistruptionBudget (con `minAvailable: 1`)**: il caso limite si ha nel caso di un Deployment con una sola replica, che verra' rimossa e ricreata causando un periodo di disservizio. Il VPA puo' anche essere utilizzato con `updateMode: Off`, fornendo cosi' solo delle raccomandazione senza applicarle.
+Come visto dalla natura degli *exit code*, non tutti sono causati da un bug applicativo. Il 137, nel caso di *OOMKilled* ed in assenza di *memory leakage*, fornisce evidenza di un problema di natura strutturale: il limite di memoria fissato in fase di *deployment* non e' piu' sufficiente per il workload e va effettuato un nuovo dimensionamento. Come detto in precedenza, il VPA  puo' aiutare aggiornando i *requests* e *limits* delle risorse del pod, effettuandone pero' un restart nel caso di `updateMode` uguale a `Recreate` o `InPlaceOrRecreate`. Per queste due modalita' **e' buona norma tenere in considerazione la disponibilita' delle repliche del pod ed eventualmente abbinare il VPA ad un PodDisruptionBudget (con `minAvailable: 1`)**: il caso limite si ha nel caso di un Deployment con una sola replica, che verra' rimossa e ricreata causando un periodo di disservizio. Il VPA puo' anche essere utilizzato con `updateMode: Off`, fornendo cosi' solo delle raccomandazioni senza applicarle.
 
 La casistica di *exit code* 143/137 anche non e' legata necessariamente ad un problema applicativo, piuttosto prevede un corretto *fine-tuning* del `terminationGracePeriodSeconds` per assecondare il naturale *shutdown time* del workload.
 
