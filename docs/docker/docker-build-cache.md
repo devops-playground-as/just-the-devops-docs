@@ -1,7 +1,4 @@
 # Docker build cache
-**References**
-- [Docker build cache](https://docs.docker.com/build/cache/)
-
 Quando viene fatta la build di un'immagine Docker diverse volte, trovare il modo per ottimizzare la build cache è un ottimo modo per assicurarsi che le immagini vengano buildate velocemente.
 
 Ciascuna istruzione in un Dockerfile corrisponde ad un **layer** nell'immagine Docker finale. Dunque, è possibile pensare un'immagine Docker come uno stack, dove ciascun layer aggiunge un contenuto in più rispetto al precedente.
@@ -9,10 +6,11 @@ Ciascuna istruzione in un Dockerfile corrisponde ad un **layer** nell'immagine D
 Tuttavia, quando un layer subisce una modifica, quel layer deve passare per una nuova build. In altre parole, Docker deve invalidare la cache per quel layer. Un cambiamento di un layer, condiziona anche tutti i layer successivi. Di conseguenza, anche tutti i layer successivi devono essere eseguiti di nuovo.
 ![Docker layers](/img/docker_image_layers_rebuild.png)
 
-## Ottimizzare l'uso della cache nelle build
-**References**
-- [Optimize cache usage in builds](https://docs.docker.com/build/cache/optimize/)
+**Riferimenti**
 
+- [Docker build cache](https://docs.docker.com/build/cache/)
+
+## Ottimizzare l'uso della cache nelle build
 Come detto in precedenza, durante una build con Docker, un layer è riutilizzato dalla cache se le istruizioni e i file da cui dipende non hanno subito una modifica dalla build precedente. Ci sono alcune best practices che consentono di ottimizzare l'utilizzo della cache e velocizzare il processo di build.
 
 ### Ordinare i layer
@@ -150,3 +148,7 @@ jobs:
           cache-from: type=registry,ref=user/app:buildcache
           cache-to: type=registry,ref=user/app:buildcache,mode=max
 ```
+
+**Riferimenti**
+
+- [Optimize cache usage in builds](https://docs.docker.com/build/cache/optimize/)

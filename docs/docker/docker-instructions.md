@@ -1,9 +1,5 @@
 # Istruzioni di un Dockerfile
 
-**References**
-- [Dockerfile instructions](https://docs.docker.com/build/building/best-practices/#dockerfile-instructions)
-- [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
-
 Di seguito sono riportate le istruzioni da poter inserire in un Dockerfile.
 
 - `FROM`. Definisce l'immagine di partenza per le istruzioni successive. Come best practice, è bene riferisi ad immagini officiali. Docker raccomanda l'utilizzo di immagini Alpine dato che sono controllate e di piccola size (solitamente sotto i 6MB), rimanendo sempre una distribuzione Linux completa.
@@ -43,3 +39,8 @@ Di seguito sono riportate le istruzioni da poter inserire in un Dockerfile.
   L'output del comando `pwd` sarà /path/$DIRNAME.
 
 - `ONBUILD`.
+
+**Riferimenti**
+
+- [Dockerfile instructions](https://docs.docker.com/build/building/best-practices/#dockerfile-instructions)
+- [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)

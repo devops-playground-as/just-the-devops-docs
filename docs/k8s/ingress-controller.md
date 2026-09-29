@@ -1,9 +1,5 @@
 # Ingress Controller
 
-**References**
-- [ingress-nginx/How it works](https://kubernetes.github.io/ingress-nginx/how-it-works/#avoiding-reloads-on-endpoints-changes)
-- [Kubernetes Informers](https://www.plural.sh/blog/manage-kubernetes-events-informers/)
-
 L'ingress controller è il componente che permette e regola il traffico esterno in entrata (*north-south traffic*) verso i carichi applicativi ospitati all'interno di un cluster Kubernetes. In altre parole, l'ingress controller permette il corretto funzionamento delle Ingress resources. A differenza di altre tipologie di controller che sono già presenti all'interno di un cluster e sono avviati automaticamente, questo non avviene per l'ingress controller che necessita di un'installazione dedicata. 
 
 Ci sono numerosi progetti che forniscono un ingress controller, ma [ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/main) è l'ingress controller ufficialmente sviluppato dalla community Kubernetes, che sfrutta le funzionalità di NGINX.
@@ -14,19 +10,20 @@ L'ingress-nginx è, come anticipato precedentemente, sviluppato dalla community 
 
 A tal fine, vengono utilizzati i Kubernetes Informers - un componente che consente di osservare i cambiamenti delle risorse nel cluster - e consentono di reagire sfruttando delle callbacks quando un oggetto è aggiunto, modificato o rimosso. **Tuttavia, non vi è alcun modo per sapere in anticipo se un cambiamento di determinato oggetto influenzerà il configuration file. Di conseguenza, per ogni cambiamento, bisogna costruire un nuovo modello sulla base dello stato del cluster e compararlo con il modello corrente;** se sono uguali, non viene generata una nuova configurazione NGINX e non è necessario un reload. Altrimenti, viene verificato se la differenza sia solo in termini di Endpoints: in questo caso viene inviata una lista di nuovi Endpoints ad un handler Lua che gira all'interno di NGINX utilizzando una chiamata POST ed evitando di generare un nuovo file di configurazione. In caso contrario, ovvero se la differenza dei modelli coinvolge altri aspetti oltre agli Endpoints, viene creato un nuovo configuration file sulla base del modello creato, sostituito il modello corrente e viene azionato il reload di NGINX. La rappresentazione finale della configurazione NGINX è generata a partire da un template Go utilizzando il nuovo modello come input per le variabili richieste dal template.
 
-### ingress-nginx: installazioni Bare-metal
+**Riferimenti**
 
-**References**
-- [Bare-metal considerations](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/)
+- [ingress-nginx/How it works](https://kubernetes.github.io/ingress-nginx/how-it-works/#avoiding-reloads-on-endpoints-changes)
+- [Kubernetes Informers](https://www.plural.sh/blog/manage-kubernetes-events-informers/)
+
+### ingress-nginx: installazioni Bare-metal
 
 Gli ambienti cloud consentono di disporre di risorse *on-demand* e per ingress-nginx è possibile utilizzare un semplice Kubernetes manifest per ottenere un load balancer automaticamente, stabilendo un *single point of contact* tra le applicazioni nel cluster ed il mondo esterno; infatti, tipicamente quando l'ingress-nginx viene installato, l'esposzione verso l'esterno avviene tramite un Service di tipo `LoadBalancer`. In ambienti bare-metal non è presente questa funzionalità - [Kubernetes non mette nativamente a disposizione un load balancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) - dunque è necessario modificare il setup inziale.
 
-### MetalLB: una soluzione di load balancing per installazioni bare-metal
+**Riferimenti**
 
-**Resources**
-- [MetalLB Concepts](https://metallb.io/concepts/)
-- [MetalLB in layer 2 mode](https://metallb.io/concepts/layer2/)
-- [MetalLB in BGP mode](https://metallb.io/concepts/bgp/)
+- [Bare-metal considerations](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/)
+
+### MetalLB: una soluzione di load balancing per installazioni bare-metal
 
 MetalLB implementa un network load balancer all'interno di un cluster Kubernetes. In poche parole, **consente di creare servizi di tipo `LoadBalancer` in cluster che non sono eseguiti all'interno di un cloud provider**. Questo servizio viene offerto grazie a due funzionalità quali: *address allocation* - assegnare un IP esterno ad un servizio - e *external announcement* - annunciare l'IP assegnato alla rete esterna, in modo che il traffico arrivi al cluster.
 
@@ -37,6 +34,12 @@ Dopo che un `externalIP` viene assegnato ad un service, la rete fuori dal cluste
 - Layer 2. In questa modalità, un nodo si assume la responsabilità di annunciare un Service alla rete locale. Dal punto di vista di rete, è come se una macchina avesse più indirizzi IP, cosa che si evince anche dalle tabelle ARP. MetalLB, infatti, risponde alle richieste ARP per i servizi IPv4 e alle richieste NDP per IPv6. Il vantaggio di questa modalità è la possibilità di essere utilizzato in maniera universale, senza la necessità di hardware particolare. In Layer 2, tutto il traffico va verso un solo nodo (*single-node bottlenecking*), successivamente è kube-proxy che distribuisce il traffico fino ai pod. Layer 2 **non implementa un load balancer, quanto piuttosto un meccanismo di failover che consente ad un nodo diverso di divenire "leader" se il nodo che riceve traffico fallisce per qualche motivo**.
 
 - BGP. In questa modalità ogni nodo del cluster stabilisce una sessione di peering BGP con i router della rete ed utilizza questa sessione per annunciare gli indirizzi IP dei Services esposti all'esterno - di tipo `LoadBalancer` - del cluster. Questa modalità consente un vero bilanciamento del carico che viene fatto *per-connection*, ovvero tutti i pacchetti di una singola connessione vengono inviati ad un determinato nodo nel cluster. La divisione del traffico, e quindi il bilanciamento, avviene solo tra connessioni diverse e non dentro una singola connessione; ad esempio, date due connessioni A, B ed un cluster con tre nodi 1, 2 e 3, MetalLB bilancerà tutti i pacchetti della connessione A sul nodo 1 e tutti i pacchetti della connessione B su nodo 2. Questa implementazione evita il *packet reordering*, migliorando sensibilmente la performance sull'host finale. Inoltre, evita che nodi diversi inviino pacchetti a Pods diversi, in quanto la scelta dell'indirizzamento di un pacchetto non è consistente tra nodi distinti. Questo vuol dire che due nodi differenti possono decidere di instradare pacchetti appartenenti alla stessa connessione a Pods distinti.
+
+**Riferimenti**
+
+- [MetalLB Concepts](https://metallb.io/concepts/)
+- [MetalLB in layer 2 mode](https://metallb.io/concepts/layer2/)
+- [MetalLB in BGP mode](https://metallb.io/concepts/bgp/)
 
 ### MetalLB: approfondimento su Layer2
 
