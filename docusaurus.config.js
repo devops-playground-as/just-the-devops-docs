@@ -87,7 +87,7 @@ const config = {
         title: 'Just-The-DevOps-Docs',
         logo: {
           alt: 'Just-The-DevOps-Docs',
-          src: 'img/logo.svg',
+          src: 'img/logo.png',
         },
         items: [
           {
