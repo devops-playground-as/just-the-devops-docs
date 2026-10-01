@@ -1,5 +1,15 @@
-import RecreateTraffic from '@site/static/img/k8s/recreate.png';
+import RecreateTraffic from '@site/static/img/k8s/recreate-traffic-v2.png';
 import RecreateGif from '@site/static/img/k8s/recreate.gif';
+import RampedTraffic from '@site/static/img/k8s/ramped-traffic-v2.png';
+import RampedGif from '@site/static/img/k8s/ramped.gif';
+import BlueGreenTraffic from '@site/static/img/k8s/blue-green-traffic-v2.png';
+import BlueGreenGif from '@site/static/img/k8s/blue-green.gif';
+import CanaryTraffic from '@site/static/img/k8s/canary-traffic-v2.png';
+import CanaryGif from '@site/static/img/k8s/canary.gif';
+import ABTraffic from '@site/static/img/k8s/a-b-traffic-v2.png';
+import ABGif from '@site/static/img/k8s/a-b.gif';
+import ShadowTraffic from '@site/static/img/k8s/shadow-traffic-v2.png';
+import ShadowGif from '@site/static/img/k8s/shadow.gif';
 
 # Strategie di deploy
 
@@ -11,6 +21,21 @@ Di seguito sono riepilogate le principali strategie di *deploy* che possono esse
 
 ## Recreate
 
+<div class="img-container">
+  <div class="img-container__narrow">
+    <img
+      src={RecreateGif}
+      alt="Andamento del traffico nella strategia Recreate"
+    />
+  </div>
+  <div>
+    <img
+      src={RecreateTraffic}
+      alt="Andamento del traffico nella strategia Recreate"
+    />
+  </div>
+</div>
+
 La strategia di *Recreate* e' la piu' semplice e consiste nello spegnere la versione A, i cui workload vengono eliminati, ed effettuare il deploy della versione B dopo che tutti i workload della versione A sono stati spenti.
 
 **PROs**
@@ -20,63 +45,111 @@ La strategia di *Recreate* e' la piu' semplice e consiste nello spegnere la vers
 **CONs**
 - L'utente sperimenta un disservizio, sia a causa dello spegnimento dell'applicazione che per il suo successivo *startup*.
 
-
-<img
-  src={RecreateGif}
-  alt="Andamento del traffico nella strategia Recreate"
-  width={600}
-/>
-<img
-  src={RecreateTraffic}
-  alt="Andamento del traffico nella strategia Recreate"
-  width={500}
-/>
-
-![Recreate](/img/k8s/recreate.gif)
-![Recreate Traffic](/img/k8s/recreate.png)
-
 ## Ramped (Rolling Update)
 
+<div class="img-container">
+  <div class="img-container__narrow">
+    <img src={RampedGif} alt="Ramped" />
+  </div>
+  <div>
+    <img src={RampedTraffic} alt="Ramped Traffic" />
+  </div>
+</div>
+
+La strategia *Ramped* consiste nel fare un progressivo rollout the della nuova versione dell'applicazione, rimpiazzando le vecchie istanze una dopo l'altra, finchè non vengono rimpiazzate tutte le istanze. Solitamente, in base al sistema che effettua il deployment, possono essere configurati i seguenti parametri.
+
+- Parallelismo, *max batch size*. Il numero di istanze concorrenti per cui fare il rollout.
+
+- *Max Surge*. Il numero massimo di istanze in più che possono essere aggiunte a quelle attualmente presenti.
+
+- *Max Unavailable*. Il numero massimo di istanze non disponibili durante il processo di rollout.
+
 **PROs**
+- Facile da configurare (in Kubernetes la *strategy RollingUpdate* è quella di default).
+- La nuova versione viene introdotta gradualmente in produzione.
+- Strategia buona per applicazioni stateful distribuite che sanno mantenere la disponibilità e i dati vengono riequilibrati tra le nuove istanze.
 
 **CONs**
-
-
-![Ramped](/img/k8s/ramped.gif)
-![Ramped Traffic](/img/k8s/ramped.png)
+- Non c'è alcun controllo sul traffico.
+- Il rollback richiede più tempo.
+- Il supporto per più APIs può essere complesso, sopratutto se alcune di queste vengono deprecate. Spesso bisogna mantenere la *backward compatibility*.
 
 ## Blue-Green
-![Blue Green](/img/k8s/blue-green.gif)
-![Blue Green Traffic](/img/k8s/blue-green.png)
+
+<div class="img-container">
+  <div class="img-container__narrow">
+    <img src={BlueGreenGif} alt="Blue Green" />
+  </div>
+  <div>
+    <img src={BlueGreenTraffic} alt="Blue Green Traffic" />
+  </div>
+</div>
+
+La strategia *Blue-Green* differisce dalla *Ramped* perchè viene effettuato il deploy della *versione B (green)* "accanto" alla *versione A (blue)*, esattamente con lo stesso numero di istanze (se il numero di replice della A è 3, anche la B avrà 3 repliche). Una volta che tutte le repliche della nuova versione sono up-and-running, il traffico viene switchato dalla *versione A* alla *versione B*.
+
+**PROs**
+- Il rollback è immediato.
+- Il passaggio repentino da una versione all'altra evita problemi di versionamento.
+
+**CONs**
+- Costosa, perchè richiede la duplicazione delle risorse.
+- Gestire applicazioni *stateful* può essere difficile.
+- Bisogna testare l'intera piattaforma prima di un rilascio in produzione. Il vero rischio è nel funzionamento end-to-end.
 
 ## Canary
 
+<div class="img-container">
+  <div class="img-container__narrow">
+    <img src={CanaryGif} alt="Canary" />
+  </div>
+  <div>
+    <img src={CanaryTraffic} alt="Canary Traffic" />
+  </div>
+</div>
+
+La strategia *Canary* consiste nello shift graduale del traffico produttivo dalla *versione A* alla *versione B*. Solitamente la divisione è fatta sulla base di quanto traffico deve andare ad *A* e quanto a *B*, e.g. *A* riceve il 90% del traffico totale, mentre *B* solo il 10%. Questa strategia può essere utile quando si vuole verificare il comportamento di una nuova release con traffico produttivo, ma limitandone la portata e gli eventuali impatti.  
+
 **PROs**
+- La nuova versione sarà dapprima visibile solo ad un sottoinsieme di utenti.
+- Utile per *error rate* e *performance monitoring*.
+- Rollback veloce.
 
 **CONs**
-
-![Canary](/img/k8s/canary.gif)
-![Canary Traffic](/img/k8s/canary.png)
+- Rollout lento.
+- Una piccola percentuale di traffico potrebbe non essere rappresentativa.
+- Maggiore complessità operativa (necessità di gestire due versioni).
 
 ## A/B Test
 
+<div class="img-container">
+  <div class="img-container__narrow">
+    <img src={ABGif} alt="A/B" />
+  </div>
+  <div>
+    <img src={ABTraffic} alt="A/B Traffic" />
+  </div>
+</div>
+
 **PROs**
 
 **CONs**
-
-![A/B](/img/k8s/a-b.gif)
-![A/B Traffic](/img/k8s/a-b.png)
 
 ## Shadow
 
+<div class="img-container">
+  <div class="img-container__narrow">
+    <img src={ShadowGif} alt="Shadow" />
+  </div>
+  <div>
+    <img src={ShadowTraffic} alt="Shadow Traffic" />
+  </div>
+</div>
+
 **PROs**
 
 **CONs**
 
-![Shadow](/img/k8s/shadow.gif)
-![Shadow Traffic](/img/k8s/shadow.png)
 
-
-**Risorse**
+**Riferimenti**
 
 - [Six Strategies for Application Deployment](https://thenewstack.io/deployment-strategies/)
