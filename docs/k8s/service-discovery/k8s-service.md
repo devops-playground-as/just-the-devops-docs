@@ -1,4 +1,4 @@
-# Service Resource
+# Service
 
 ## External Traffic Policy
 

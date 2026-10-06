@@ -1,0 +1,7 @@
+{
+  "label": "Service discovery",
+  "link": {
+    "type": "generated-index",
+    "description": "L'esposizione dei workloads all'interno di Kubernetes."
+  }
+}
