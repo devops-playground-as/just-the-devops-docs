@@ -19,6 +19,8 @@ Di seguito sono riepilogate le principali strategie di *deploy* che possono esse
 - sara' mostrata un'immagine animata che illustra il funzionamento della strategia
 - sara' rappresentato l'andamento dello *user-traffic* da versione A a versione B.   
 
+![Deployment Strategies](/img/k8s/deployment-strategies.png)
+
 ## Recreate
 
 <div class="img-container">
@@ -130,9 +132,26 @@ La strategia *Canary* consiste nello shift graduale del traffico produttivo dall
   </div>
 </div>
 
+La strategia di deploy A/B testing consiste nell'indirizzare un sottinsieme di utenti verso una nuova funzionalità, sotto specifiche condizioni. Non viene effettuato un vero e proprio deploy, in quanto questa strategia viene utilizzata principalemente per decisioni di business basate sulle statistiche. Tuttavia, è legata al *Canary Deployment* e può essere implementata nello stesso modo con accorgimenti ulteriori per il controllo del traffico, le cui modalità di distribuzione possono basarsi principalmente su:
+
+- Cookies
+- Query Parameters
+- Geolocalizzazione
+- Lingua
+
+Risulta inoltre importante mantenere una certa *stickiness*: lo stesso utente dovrebbe vedere la stessa versione. In altre parole, si vuole mantenere una coerenza dell'esperienza utente.
+
+> **Nota**. La differenza tra *Canary* e *A/B Test* risiede nella domanda che ci si pone quando viene impiegata la strategia:
+> - *Canary*: la nuova versione è abbastanza stabile e sicura per essere promossa? 
+> - *A/B Test*: quale delle due funzionalità produce il migliore comportamento utente?
+
 **PROs**
+- Diverse versioni sono eseguite in parallelo.
+- Controllo sulla distribuzione del traffico.
 
 **CONs**
+- Richiede un bilanciamento del traffico intelligente.
+- Difficile fare *troubleshooting* perchè le richieste attraversano servizi e versioni diverse. Il tracing distribuito è necessario per ricostruire un flusso end-to-end. 
 
 ## Shadow
 
@@ -145,11 +164,20 @@ La strategia *Canary* consiste nello shift graduale del traffico produttivo dall
   </div>
 </div>
 
+Uno *Shadow deployment* consiste nell'installare una *versione B* accanto ad una *versione A*, inviando il traffico diretto verso *A* anche verso *B* senza avere impatti sull'ambiente produttivo e sugli utenti. Questa tecnica risulta molto utile nel caso dsi voglia verificare l'impatto di un carico reale su una nuova feature. Un rollout della *versione B* viene azionato quando i livelli di stabilità e di performance del servizio incontrano i requisiti attesi. Questa tecnica risulta particolarmente complessa, specialmente per il traffico di ritorno, sopratutto nei casi di applicazioni critiche (es. applicazioni che coinvolgono pagamenti/shopping carts). Il tutto può essere risolto ricorrendo a *mock service* costruiti ad hoc. 
+
 **PROs**
+- Test di performance con traffico reale.
+- Nessun impatto sull'utente.
+- Nessun rollout fintanto che non vengono verificati i requisiti prestazionali.
 
 **CONs**
-
+- Duplica le risorse.
+- Richiede un setup complesso.
+- Richiede l'utilizzo di *mock service* in determinati casi.
 
 **Riferimenti**
 
 - [Six Strategies for Application Deployment](https://thenewstack.io/deployment-strategies/)
+- [Kubernetes deployment strategies](https://blog.container-solutions.com/kubernetes-deployment-strategies)
+- [k8s-deployment-strategies GitHub Repo for deployment strategies implementation](https://github.com/ContainerSolutions/k8s-deployment-strategies)
