@@ -39,7 +39,10 @@ I Pod in Kubernetes sono risorse effimere e possono essere soggetti a mutamenti:
 - raggruppano gli endpoint su una combinazione di IP, protocollo, numero di porta e Service name;
 - vengono gestiti dal control plane.
 
+> **Nota: Endpoint vs EndpointSlices**. Gli Endpoint sono il metodo legacy con cui veniva tenuta traccia degli endpoint dei Service in Kubernetes. Gli **Endpoint** tenevano traccia di tutti gli IP e delle porte dei Pod che erano dietro un Service in **unico oggetto** Kubernetes. L'oggetto veniva poi aggiornato seguendo il ciclo di vita dei Pod coinvolti, gestendo fino ad un massimo di 1000 Pod. Gli **EndpointSlices**, in GA da Kubernetes 1.21, **risolvono il problema di scalabilità** degli Endpoint suddividendo i Pod in oggetti più piccoli (massimo 100 endpoint), raggruppati come detto secondo IP, numero di porta e Service name. In altre parole, Endpoint ed EndpointSlices hanno lo stesso scopo ma organizzano le informazioni in modo diverso. 
+
 **Riferimenti**
 
 - [Kubernetes Patterns - Reusable Elements for Designing Cloud Native Applications, Bilgin Ibryam and Roland Huß](https://www.oreilly.com/library/view/kubernetes-patterns/9781492050278/)
 - [EndpointSlices](https://kubernetes.io/docs/concepts/services-networking/endpoint-slices/)
+- [Endpoints and Endpoint Slices Overview](https://notes.kodekloud.com/docs/Kubernetes-Networking-Deep-Dive/Kubernetes-Services/Endpoints-and-Endpoint-Slices-Overview/page)
