@@ -1,8 +1,6 @@
 # Just the DevOps Docs
 
-<p align="center">
-  <img src="static/img/logo.png" alt="Logo Just the DevOps Docs" width="180" />
-</p>
+![Logo Just the DevOps Docs](static/img/just-the-devops-docs.png)
 
 **Just the DevOps Docs nasce per raccogliere in un unico punto fonti e approfondimenti sui diversi ambiti del mondo DevOps**, con un'attenzione particolare, al momento, a Kubernetes. L'obiettivo è rendere più semplice, trovare e consultare informazioni che altrimenti sarebbero sparse tra risorse diverse.
 
