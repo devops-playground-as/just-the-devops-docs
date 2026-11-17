@@ -1,4 +1,4 @@
-# Ingress Controller
+# External service discovery: Ingress Controller
 
 L'ingress controller è il componente che permette e regola il traffico esterno in entrata (*north-south traffic*) verso i carichi applicativi ospitati all'interno di un cluster Kubernetes. In altre parole, l'ingress controller permette il corretto funzionamento delle Ingress resources. A differenza di altre tipologie di controller che sono già presenti all'interno di un cluster e sono avviati automaticamente, questo non avviene per l'ingress controller che necessita di un'installazione dedicata. 
 
