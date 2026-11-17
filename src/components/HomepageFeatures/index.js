@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
@@ -7,44 +6,50 @@ const FeatureList = [
   {
     title: 'Docker',
     label: 'Container',
-    description: 'Immagini, cache di build, processi e concetti fondamentali per lavorare con i container.',
+    path: 'docs/docker/',
+    description: 'Dalle immagini ai processi: capire cosa succede dentro un container e come costruirlo meglio.',
     to: '/docs/docker/docker-instructions',
   },
   {
     title: 'Kubernetes',
     label: 'Orchestrazione',
-    description: 'Risorse, networking, scheduling e casi pratici per orientarsi nel cluster.',
-    to: '/docs/k8s/prerequirements',
+    path: 'docs/k8s/',
+    description: 'Installazione, risorse, networking e casi pratici. Un percorso per orientarsi nel cluster.',
+    to: '/docs/k8s/installation/prerequirements',
   },
   {
-    title: 'In espansione',
-    label: 'Prossimamente',
-    description: 'Linux, sistemi distribuiti e altri fondamenti dell’infrastruttura moderna.',
+    title: 'Site Reliability',
+    label: 'Affidabilità',
+    path: 'docs/site-reliability/',
+    description: 'SLI e SLO: misurare il comportamento dei servizi e definire cosa significa essere affidabili.',
+    to: '/docs/site-reliability/sli-slo',
   },
 ];
 
-function Feature({title, label, description, to}) {
-  const content = <>
-    <span className={styles.featureLabel}>{label}</span>
-    <Heading as="h3">{title}</Heading>
-    <p>{description}</p>
-    {to && <span className={styles.featureLink}>Esplora <span aria-hidden="true">→</span></span>}
-  </>;
-
-  return (
-    <div className={clsx('col col--4')}>
-      {to ? <Link className={styles.featureCard} to={to}>{content}</Link> : <div className={styles.featureCard}>{content}</div>}
-    </div>
-  );
-}
-
 export default function HomepageFeatures() {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
+    <section className={styles.features} aria-labelledby="topics-title">
+      <div className={styles.container}>
+        <div className={styles.sectionHeader}>
+          <div>
+            <span className={styles.sectionLabel}>01 / Esplora gli argomenti</span>
+            <Heading as="h2" id="topics-title">Da dove vuoi partire?</Heading>
+          </div>
+          <p>Concetti, esempi e casi limite.<br />Un argomento alla volta.</p>
+        </div>
+        <div className={styles.featureGrid}>
+          {FeatureList.map(({title, label, path, description, to}, idx) => (
+            <Link className={styles.featureCard} to={to} key={title}>
+              <div className={styles.cardHeader}>
+                <span>{label}</span>
+                <span className={styles.cardNumber} aria-hidden="true">0{idx + 1}</span>
+              </div>
+              <Heading as="h3">{title}</Heading>
+              <p>{description}</p>
+              <span className={styles.featureLink}>
+                <span>{path}</span><span aria-hidden="true">↗</span>
+              </span>
+            </Link>
           ))}
         </div>
       </div>

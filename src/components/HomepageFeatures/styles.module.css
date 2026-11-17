@@ -1,63 +1,131 @@
 .features {
-  padding: 5rem 0 4rem;
-  width: 100%;
+  padding: 4rem 0;
+}
+
+.container {
+  max-width: 1248px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.sectionLabel,
+.cardHeader,
+.featureLink {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--home-muted);
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: var(--home-ink);
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.sectionHeader p {
+  margin: 0;
+  color: var(--home-muted);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--home-line);
+  border-left: 1px solid var(--home-line);
 }
 
 .featureCard {
   display: flex;
-  min-height: 15.5rem;
+  min-width: 0;
   flex-direction: column;
-  margin-bottom: 1.5rem;
   padding: 1.75rem;
-  border: 1px solid var(--ifm-toc-border-color);
-  border-radius: 0.5rem;
-  background: var(--ifm-background-surface-color);
-  color: inherit;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  border-right: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+  background: var(--home-surface);
+  color: var(--home-ink);
+  transition: background 160ms ease;
 }
 
-a.featureCard:hover {
-  border-color: var(--ifm-color-primary-light);
-  color: inherit;
+.featureCard:hover {
+  background: rgb(70 110 220 / 5%);
+  color: var(--home-ink);
   text-decoration: none;
-  box-shadow: 0 0.75rem 1.75rem rgba(31, 66, 106, 0.11);
-  transform: translateY(-3px);
 }
 
-.featureLabel {
-  color: var(--ifm-color-primary-dark);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+.featureCard:focus-visible {
+  outline: 2px solid var(--home-accent);
+  outline-offset: -3px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--home-muted);
+}
+
+.cardNumber {
+  color: var(--home-accent);
 }
 
 .featureCard h3 {
-  margin: 0.8rem 0;
-  color: var(--ifm-heading-color);
-  font-size: 1.45rem;
+  margin: 1.75rem 0 0.8rem;
+  color: var(--home-ink);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .featureCard p {
-  margin: 0;
-  color: var(--ifm-font-color-secondary);
-  line-height: 1.65;
+  margin: 0 0 2rem;
+  color: var(--home-muted);
+  font-size: 0.95rem;
+  line-height: 1.8;
 }
 
 .featureLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: auto;
-  padding-top: 1.5rem;
-  color: var(--ifm-color-primary-dark);
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding-top: 1rem;
+  border-top: 1px solid var(--home-line);
+  color: var(--home-accent);
+  overflow-wrap: anywhere;
 }
 
-[data-theme='dark'] .featureLabel,
-[data-theme='dark'] .featureLink {
-  color: var(--ifm-color-primary-light);
+.featureLink > :last-child {
+  font-size: 1.1rem;
 }
 
 @media screen and (max-width: 996px) {
-  .features { padding: 3.5rem 0 2rem; }
+  .featureCard { padding: 1.25rem; }
+}
+
+@media screen and (max-width: 700px) {
+  .features { padding: 2.5rem 0; }
+  .featureGrid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featureCard { transition: none; }
 }

@@ -1,39 +1,55 @@
 import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import ServerStatusIllustration from '@site/static/img/server-status.svg';
-
+import homepageImage from '@site/static/img/just-the-devops-docs.png';
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
   return (
     <header className={styles.heroBanner}>
       <div className={styles.heroGrid}>
         <div className={styles.heroCopy}>
-          <span className={styles.eyebrow}>Knowledge base: DevOps &amp; Beyond</span>
+          <span className={styles.eyebrow}>
+            <span className={styles.statusDot} aria-hidden="true" />
+            Knowledge base / in italiano
+          </span>
           <Heading as="h1" className={styles.heroTitle}>
             La conoscenza tecnica,<br />
-            messa nero su bianco.
+            <span>messa nero su bianco.</span>
           </Heading>
           <p className={styles.heroSubtitle}>
-            {siteConfig.title} raccoglie ed approfondisce concetti, casi limite e riferimenti per
-            comprendere meglio principalmente gli strumenti DevOps e non solo.
+            Fonti diverse, un punto di partenza. Appunti e approfondimenti su DevOps,
+            Kubernetes e sistemi, per capire come funzionano e ritrovare ciò che serve.
           </p>
           <div className={styles.buttons}>
-            <Link className="button button--primary button--lg" to="/docs/">
-              Esplora gli argomenti
+            <Link className={styles.primaryButton} to="/docs/">
+              Esplora la documentazione
             </Link>
-            <Link className={styles.textLink} to="/docs/k8s/prerequirements">
-              Inizia da Kubernetes <span aria-hidden="true">→</span>
+            <Link className={styles.textLink} to="/docs/k8s/installation/prerequirements">
+              Parti da Kubernetes <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
         <div className={styles.heroIllustration}>
-          <ServerStatusIllustration role="img" aria-label="Illustrazione di un server monitorato" />
+          <div className={styles.figureHeader}>
+            <span>just-the-devops-docs /</span>
+            <span aria-hidden="true">[ open knowledge ]</span>
+          </div>
+          <div className={styles.imageCanvas}>
+            <img src={homepageImage} alt="Just the DevOps Docs" fetchPriority="high" />
+          </div>
+          <div className={styles.figureFooter}>
+            <span>Leggere. Capire. Condividere.</span>
+            <span aria-hidden="true">↗</span>
+          </div>
         </div>
+      </div>
+      <div className={styles.heroFootnote}>
+        <span>Costruita per imparare, aperta a chi vuole contribuire.</span>
+        <Link to="https://github.com/devops-playground-as/just-the-devops-docs">
+          Il progetto su GitHub <span aria-hidden="true">↗</span>
+        </Link>
       </div>
     </header>
   );
@@ -41,33 +57,47 @@ function HomepageHeader() {
 
 function KnowledgePrinciples() {
   return (
-    <section className={styles.principles}>
+    <section className={styles.principles} aria-labelledby="approach-title">
       <div>
-        <span className={styles.sectionLabel}>L&apos;approccio</span>
-        <Heading as="h2">Note pensate per essere ritrovate e riutilizzate.</Heading>
+        <span className={styles.sectionLabel}>02 / Il metodo</span>
+        <Heading as="h2" id="approach-title">Capire prima.<br />Scrivere poi.</Heading>
+        <p className={styles.principlesIntro}>
+          Il valore è anche nel percorso: studiare le fonti, mettere a fuoco i concetti
+          e renderli utili a chi verrà dopo.
+        </p>
       </div>
-      <p>
-        <b>Non una raccolta di appunti sparsi</b>: una documentazione in evoluzione,
-        scritta per <b>fissare i concetti</b> e <b>tornare rapidamente alle informazioni </b>
-        che servono nel lavoro quotidiano.
-      </p>
+      <ol className={styles.methodList}>
+        <li>
+          <Heading as="h3">Partire dalle fonti</Heading>
+          <p>Libri, documentazione e articoli: prospettive diverse per approfondire lo stesso argomento.</p>
+        </li>
+        <li>
+          <Heading as="h3">Rielaborare per comprendere</Heading>
+          <p>Contenuti studiati e scritti dai contributor, in italiano e con riferimenti alle fonti.</p>
+        </li>
+        <li>
+          <Heading as="h3">Condividere per crescere</Heading>
+          <p>Una base di conoscenza aperta, da consultare, correggere e arricchire insieme.</p>
+        </li>
+      </ol>
     </section>
   );
 }
 
 export default function Home() {
-  const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
       title="Appunti e guide su DevOps, Kubernetes e sistemi"
       description="Una knowledge base in italiano su DevOps, container, Kubernetes e sistemi.">
-      <HomepageHeader />
-      <main>
-        <HomepageFeatures />
-        <div className="container">
-          <KnowledgePrinciples />
-        </div>
-      </main>
+      <div className={styles.homepage}>
+        <HomepageHeader />
+        <main>
+          <HomepageFeatures />
+          <div className={styles.contentWidth}>
+            <KnowledgePrinciples />
+          </div>
+        </main>
+      </div>
     </Layout>
   );
 }
