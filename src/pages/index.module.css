@@ -169,9 +169,6 @@
   justify-content: center;
   min-height: 18rem;
   padding: 1.25rem 0.5rem;
-  background-color: #eff4ff;
-  background-image: radial-gradient(#b9c9e6 0.8px, transparent 0.8px);
-  background-size: 12px 12px;
 }
 
 .imageCanvas img {
