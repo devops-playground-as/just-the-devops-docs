@@ -48,7 +48,7 @@ const config = {
         respectPrefersColorScheme: true,
       },
       navbar: {
-        title: 'Just-The-DevOps-Docs',
+        title: 'JTDD',
         logo: {
           alt: 'Just-The-DevOps-Docs',
           src: 'img/logo.png',
@@ -58,6 +58,11 @@ const config = {
             to: '/docs/',
             position: 'left',
             label: 'DevOps',
+          },
+          {
+            href: 'https://landscape.cncf.io/',
+            position: 'left',
+            label: 'CNCF Landscape',
           },
           {
             href: 'https://github.com/devops-playground-as/just-the-devops-docs',
