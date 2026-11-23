@@ -82,8 +82,8 @@ Infine, per autenticarsi su Vault l'Injector ha bisogno di un ServiceAccount che
 
 **Riferimenti**.
 
-- [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
 - [Kubernetes Patterns - Reusable Elements for Designing Cloud Native Applications, Bilgin Ibryam and Roland Huß](https://www.oreilly.com/library/view/kubernetes-patterns/9781492050278/)
 - [Secret Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/introduction)
+- [Manage Secrets on AWS EKS using Secrets Store CSI Dirver](https://devopscube.com/secrets-store-csi-dirver-eks/)
 - [Vault Agent Injector vs. Vault CSI Provider](https://developer.hashicorp.com/vault/docs/deploy/kubernetes/injector-csi#vault-sidecar-agent-injector)
 - [Vault Agent Injector](https://developer.hashicorp.com/vault/docs/deploy/kubernetes/injector)
